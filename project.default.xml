@@ -1,0 +1,17 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="DefaultGradleProjectSettings">
+        <option name="isMigrated" value="true" />
+      </component>
+      <component name="GradleLocalSettings">
+        <option name="projectSyncType">
+          <map>
+            <entry key="D:/Global/Program Files/Minecraft/Projects/forge/mdk/MasterGuild" value="PREVIEW" />
+            <entry key="D:/Global/Program Files/Minecraft/Projects/forge/mdk/forge-1.13.2-25.0.109-mdk/Projects" value="PREVIEW" />
+          </map>
+        </option>
+      </component>
+    </defaultProject>
+  </component>
+</application>
