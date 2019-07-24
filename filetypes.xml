@@ -2,6 +2,7 @@
   <component name="FileTypeManager" version="17">
     <extensionMap>
       <mapping pattern="MGExtendedPlayer" type="CLASS" />
+      <mapping pattern="CommandSticks" type="CLASS" />
       <mapping pattern="mcmod.info" type="JSON" />
     </extensionMap>
   </component>
