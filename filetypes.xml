@@ -4,6 +4,7 @@
       <mapping pattern="MGExtendedPlayer" type="CLASS" />
       <mapping pattern="CommandSticks" type="CLASS" />
       <mapping pattern="mcmod.info" type="JSON" />
+      <mapping pattern="TODO" type="PLAIN_TEXT" />
     </extensionMap>
   </component>
 </application>
