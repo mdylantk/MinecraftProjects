@@ -1,0 +1,5 @@
+name: DTKOceanSurvival
+version: ${project.version}
+main: dtkoceansurvival.dtkoceansurvival.DTKOceanSurvival
+api-version: 1.13
+load: startup
