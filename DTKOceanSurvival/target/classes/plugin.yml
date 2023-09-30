@@ -1,5 +1,5 @@
 name: DTKOceanSurvival
 version: 1.0-SNAPSHOT
-main: dtkoceansurvival.dtkoceansurvival.DTKOceanSurvival
+main: dtk.oceansurvival.DTKOceanSurvival
 api-version: 1.13
 load: startup
