@@ -64,17 +64,19 @@ public class BottleOfAir implements Listener {
         if(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
             if(event.getItem() != null) {
                 ItemMeta meta = event.getItem().getItemMeta();
-                if(meta.getPersistentDataContainer().has(giveAirKey, PersistentDataType.INTEGER)) {
-                    int amount = event.getItem().getAmount();
-                    int airAmount = meta.getPersistentDataContainer().get(giveAirKey, PersistentDataType.INTEGER);
-                    int air = event.getPlayer().getRemainingAir();
-                    int maxAir = event.getPlayer().getMaximumAir();
-                    if (air < maxAir - airAmount) {
-                        event.getItem().setAmount(amount - 1);
-                        event.getPlayer().getWorld().dropItemNaturally(event.getPlayer().getLocation(), new ItemStack(Material.GLASS_BOTTLE, 1));
-                        event.getPlayer().setRemainingAir(air + airAmount);
+                if(meta != null) {
+                    if (meta.getPersistentDataContainer().has(giveAirKey, PersistentDataType.INTEGER)) {
+                        int amount = event.getItem().getAmount();
+                        int airAmount = meta.getPersistentDataContainer().get(giveAirKey, PersistentDataType.INTEGER);
+                        int air = event.getPlayer().getRemainingAir();
+                        int maxAir = event.getPlayer().getMaximumAir();
+                        if (air < maxAir - airAmount) {
+                            event.getItem().setAmount(amount - 1);
+                            event.getPlayer().getWorld().dropItemNaturally(event.getPlayer().getLocation(), new ItemStack(Material.GLASS_BOTTLE, 1));
+                            event.getPlayer().setRemainingAir(air + airAmount);
+                        }
+                        event.setCancelled(true);
                     }
-                    event.setCancelled(true);
                 }
             }
         }

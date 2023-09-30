@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -44,7 +45,7 @@ public class ScrollOfRecall implements Listener {
     }
 
     ShapedRecipe oceanScrollOfRecallRecipe(Plugin plugin){
-        ShapedRecipe recipe = new ShapedRecipe(recallKey,getScrollOfRecall(4,OceanWorldHandler.oceanWorld.getName()));
+        ShapedRecipe recipe = new ShapedRecipe(recallKey,getScrollOfRecall(1,OceanWorldHandler.oceanWorld.getName()));
         recipe.shape(" G ","BCB"," L ");
         recipe.setIngredient('B', new RecipeChoice.ExactChoice(BottleOfAir.getBottleOfAir(1)));
         recipe.setIngredient('G', new RecipeChoice.ExactChoice(new ItemStack(Material.GOLD_INGOT)));
@@ -58,16 +59,19 @@ public class ScrollOfRecall implements Listener {
         //offhand action or well any other action will still happen so may need a way to ignore it
         //TODO: set the meta so it can be updatesd
         if(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
-            if(event.getItem() != null) {
-                ItemMeta meta = event.getItem().getItemMeta();
-                if(meta.getPersistentDataContainer().has(recallKey, PersistentDataType.STRING)) {
-                    String worldName = meta.getPersistentDataContainer().get(recallKey, PersistentDataType.STRING);
-                    World world = event.getPlayer().getServer().getWorld(worldName);
-                    if(world != null) {
-                        event.getItem().setAmount(event.getItem().getAmount() - 1);
+            ItemStack item = event.getItem();
+            if(item != null) {
+                ItemMeta meta = item.getItemMeta();
+                if(meta != null) {
+                    if (meta.getPersistentDataContainer().has(recallKey, PersistentDataType.STRING)) {
+                        String worldName = meta.getPersistentDataContainer().get(recallKey, PersistentDataType.STRING);
+                        World world = event.getPlayer().getServer().getWorld(worldName);
+                        if (world != null) {
+                            item.setAmount(item.getAmount() - 1);
 
-                        event.getPlayer().teleport(world.getSpawnLocation());
-                        event.setCancelled(true);
+                            event.getPlayer().teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }

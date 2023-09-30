@@ -134,6 +134,11 @@ public class FlotsamSpawner implements Listener {
                         Entity oldFlotsamBoat = activeFlotsam.removeFirst();
                         if (oldFlotsamBoat != null) {
                             ((ChestBoat) oldFlotsamBoat).setLootTable(null);
+                            for(Entity oldMount : ((ChestBoat) oldFlotsamBoat).getPassengers()){
+                                if(oldMount.hasMetadata(flotsamID)){
+                                    oldMount.remove();
+                                }
+                            }
                             oldFlotsamBoat.remove();
                         }
                     }

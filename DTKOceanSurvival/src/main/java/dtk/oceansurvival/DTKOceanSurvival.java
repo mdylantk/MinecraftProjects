@@ -20,6 +20,10 @@ public final class DTKOceanSurvival extends JavaPlugin implements Listener {
     private ScrollOfRecall scrollOfRecall;
     public static JavaPlugin plugin;
 
+    public static void log(String message){
+        //a short cut to the logger as long as this plugin been enabled
+        DTKOceanSurvival.plugin.getLogger().info(message);
+    }
 
     @Override
     public void onEnable() {

@@ -1,5 +1,6 @@
 package dtk.oceansurvival.gameplay;
 
+import dtk.oceansurvival.DTKOceanSurvival;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,12 +16,12 @@ public class FloatyBlocks implements Listener {
     //NOTE: the goal of this class is to allow other blocks to be place in water like lilypads
     //but it low on the to-do list
 
-    private JavaPlugin owner;
+    //private JavaPlugin owner;
 
     public FloatyBlocks(JavaPlugin new_owner){
-        owner = new_owner;
-        owner.getServer().getPluginManager().registerEvents(this,owner);
-        owner.getLogger().info("FloatyBlocks loaded");
+        //owner = new_owner;
+        Bukkit.getServer().getPluginManager().registerEvents(this, DTKOceanSurvival.plugin);
+        DTKOceanSurvival.log("FloatyBlocks loaded");
     }
 
     @EventHandler
@@ -29,6 +30,7 @@ public class FloatyBlocks implements Listener {
             if (Tag.LOGS.isTagged(event.getItem().getType())){
                 if(event.getAction().equals(Action.RIGHT_CLICK_AIR)){
                     Block targetBlock = null;
+                    Block placeAgainst = event.getClickedBlock();
                     for(int i=1; i < 6;i++) {
                         //Location blockLoc = event.getPlayer().getEyeLocation().add(event.getPlayer().getFacing().getDirection().multiply(i));
                         Location blockLoc = event.getPlayer().getEyeLocation().add(event.getPlayer().getEyeLocation().getDirection().multiply(i));
@@ -44,6 +46,7 @@ public class FloatyBlocks implements Listener {
                                     checkBlock = event.getPlayer().getWorld().getBlockAt(blockLoc.clone().add(0,y,0));
                                     if (topBlock.getType().isSolid() || topBlock.getType().isAir()){
                                         targetBlock = checkBlock;
+                                        placeAgainst = topBlock;
                                         //owner.getLogger().info("found vaild surface block ");
                                         break;
                                     }
@@ -62,8 +65,8 @@ public class FloatyBlocks implements Listener {
 
 
                     if (targetBlock != null) {
-
-                        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(null, targetBlock.getState(), null, event.getItem(), event.getPlayer(), true, event.getHand());
+                        //TODO: need to have a place block ref and a placed against. may use the air block and the spot placed
+                        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(targetBlock, targetBlock.getState(), placeAgainst, event.getItem(), event.getPlayer(), true, event.getHand());
                         //TODO figure out how to properly use this event. current using item for mat which can be correct if checks are made.
                         Bukkit.getPluginManager().callEvent(blockPlaceEvent);
                         //TODO: may need to delay the logic? may need time for other things to modify it

@@ -36,6 +36,7 @@ public class OceanWorldHandler implements Listener {
     //if cauldren have state, could have it be salt water if filled by salt water. state be removed when empty
     //Also move air regen rate stuff to its own class and have it check world name. world depth modifier and staring y
     //also clean code up more
+    //TODO: try to find any load chunks and either remove or put them in a switch
 
     private FlotsamSpawner flotsamSpawner;
     private Currents currents;
@@ -46,10 +47,10 @@ public class OceanWorldHandler implements Listener {
             WorldCreator wc = new WorldCreator("world_endless_ocean");
             wc.generator(new FloodedOverworld(seaLevel));
 
-            Bukkit.getLogger().info("GEN SET!: " +wc.generatorSettings());
+            DTKOceanSurvival.log("GEN SET!: " +wc.generatorSettings());
             wc.createWorld();
 
-            Bukkit.getLogger().info("creating new WEO");
+            DTKOceanSurvival.log("creating new WEO");
             oceanWorld = Bukkit.getServer().getWorld("world_endless_ocean");
             oceanWorld.getPopulators().add(new OceanFloorPopulator());
             oceanWorld.getPopulators().add(new RuinPopulator());
@@ -61,10 +62,11 @@ public class OceanWorldHandler implements Listener {
                 oceanWorld.setSpawnLocation(0, seaLevel, 0);
             }
         }
+        loadSpawn(1, 1);
 
         currents = new Currents(oceanWorld);
         if (flotsamTimer == null) {
-            Bukkit.getLogger().info("creating timer");
+            DTKOceanSurvival.log("creating timer");
             flotsamTimer = Bukkit.getServer().getScheduler().runTaskTimer(DTKOceanSurvival.plugin, this::spawnFlotsam, 600, 900);
         }
 
@@ -86,36 +88,37 @@ public class OceanWorldHandler implements Listener {
         flotsamSpawner.spawnFlotsam();
     }
 
-
-    @EventHandler
-    public void onPlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
-        if (!event.getPlayer().getWorld().equals(oceanWorld)) {
-            Location location = new Location(oceanWorld, 0, seaLevel+1, 0);
-            if(location.getBlock().getType().isSolid()){
-                for(int y = seaLevel; y < oceanWorld.getMaxHeight(); y++){
-                    if (!location.getBlock().getType().isSolid()){
-                        location.setY(y);
-                        break;
-                    }
-                }
+    public void loadSpawn(int sizeX, int sizeZ){
+        for(int x = sizeX; x >= -sizeX; x--){
+            for(int z = sizeZ; z >= -sizeZ; z--){
+                oceanWorld.loadChunk(x,z);
+                DTKOceanSurvival.log("loading " + oceanWorld.getName() + " chunk at x:" + x + " z:" + z);
             }
-            event.setSpawnLocation(location);
-            event.getPlayer().setBedSpawnLocation(location);
+        }
+    }
+    public void unloadChunks(){
+        for( Chunk chunk : oceanWorld.getLoadedChunks()) {
+            //may not be the best. is meant to be called if no player is in world
+            //a brute unload all so may not be kept or modified later
+            oceanWorld.unloadChunk(chunk);
         }
     }
 
-    //TODO: try to override the generation datapack for this world structure
-    //making road and such generate at sea floor and not on to of liquids or in the middles of the ocean
-
-    /*
     @EventHandler
-    public void onEntitiesUnloadEvent(EntitiesUnloadEvent event){
-
+    public void onPlayerSpawnLocationEvent(PlayerSpawnLocationEvent event) {
+        //need a way to check if new player. could use metadata or achivement and require the player to visit one of
+        //the other dim to be able to save their cords there and not be recall to ocean. also could store a meta
+        //called last location that can be used in a similar way
+        if (event.getPlayer().getBedSpawnLocation() == null && !event.getPlayer().getWorld().equals(oceanWorld)) {
+            event.setSpawnLocation(oceanWorld.getSpawnLocation());
+            //overrides world spawn to endless ocean
+        }
     }
-    */
+
+
     @EventHandler
     public void onEntityAirChangeEvent(EntityAirChangeEvent event){
-
+        //may see if world meta could work. then can use that to get data
         if (((LivingEntity)event.getEntity()).getEyeLocation().getBlock().getType().isAir()){
             int amount = event.getAmount();
             //the idea is to reduce air regen base on depth
@@ -133,7 +136,7 @@ public class OceanWorldHandler implements Listener {
         }
 
 
-        //Bukkit.getLogger().info("air change trigger : " + event.getAmount());
+        //DTKOceanSurvival.log("air change trigger : " + event.getAmount());
     }
 
 
@@ -154,7 +157,7 @@ public class OceanWorldHandler implements Listener {
                 if (otherWorld != null) {
                     //should add a flag to remove blocks or spawn in air. issue with later is that it probably kill player
                     Location location = new Location(otherWorld, Math.floor(event.getEntity().getLocation().getX())+0.5, otherWorld.getLogicalHeight()-3, Math.floor(event.getEntity().getLocation().getZ())+0.5);
-                    otherWorld.loadChunk(location.getBlockX(),location.getBlockZ());
+                    //otherWorld.loadChunk(location.getBlockX(),location.getBlockZ());
                     for(int y = otherWorld.getLogicalHeight(); y > otherWorld.getLogicalHeight() - 6; y--){
                         Block block = otherWorld.getBlockAt(location.getBlockX(),y,location.getBlockZ());
                         if (block.getType().equals(Material.BEDROCK) || block.getType().equals(Material.NETHERRACK)){
@@ -176,7 +179,7 @@ public class OceanWorldHandler implements Listener {
                 if(block.getType().equals(Material.BEDROCK)){
                     if(block.getY() >= event.getPlayer().getWorld().getLogicalHeight()-3){ //reducing the range so it more likly to use the block where someone spawned
                         Location location = new Location(oceanWorld,Math.floor(event.getPlayer().getLocation().getBlockX())+0.5,oceanWorld.getMinHeight(),Math.floor(event.getPlayer().getLocation().getBlockZ())+0.5);
-                        oceanWorld.loadChunk(location.getBlockX(),location.getBlockZ());
+                        //oceanWorld.loadChunk(location.getBlockX(),location.getBlockZ());
                         Block bottomBlock = oceanWorld.getBlockAt(location.getBlockX(),oceanWorld.getMinHeight(),location.getBlockZ());
                         if(bottomBlock.getType().isAir() || bottomBlock.isLiquid()){
                             bottomBlock.setType(Material.ICE);
